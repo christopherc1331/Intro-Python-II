@@ -3,9 +3,14 @@
 
 
 class Player:
-    def __init__(self, name, currentRoom):
+    def __init__(self, name, current_room):
         self.name = name
-        self.currentRoom = currentRoom
+        self.current_room = current_room
 
     def __str__(self):
-        return f"{self.name} is currently in the {self.currentRoom}"
+        if self.current_room == "outside":
+            return f"{self.name} is currently {self.current_room}"
+        elif self.current_room == "treasure":
+            return f"{self.name} is currently in the {self.current_room} room"
+        else:
+            return f"{self.name} is currently in the {self.current_room}"
