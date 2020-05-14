@@ -83,13 +83,10 @@ while entry != "q":
 
     if entry != "q":
         try:
-            current_room_key = key_list[val_list.index(player1.current_room)]
-            destinationObj = getattr(rooms[current_room_key], f"{entry}_to")
-            destination_room_key = key_list[val_list.index(destinationObj)]
-            player1.current_room = destinationObj
+            player1.current_room = getattr(player1.current_room, f"{entry}_to")
             print("=========================")
             print("")
-            print(f"{player1.name} went {entry} to {destinationObj.name}")
+            print(f"{player1.name} went {entry} to {player1.current_room.name}")
             print("=========================")
             print("")
         except:
