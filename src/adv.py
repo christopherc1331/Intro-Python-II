@@ -42,7 +42,7 @@ to north. The smell of gold permeates the air.""",
 chamber! Sadly, it has already been completely emptied by
 earlier adventurers. The only exit is to the south.""",
         [
-            Item("", "Should probably hang on to this"),
+            Item("coin", "The only treasure left in this room"),
             Item("notepad", "I think I can see some writing on here"),
         ],
     ),
@@ -67,7 +67,7 @@ rooms["treasure"].s_to = rooms["narrow"]
 
 # Make a new player object that is currently in the 'outside' room.
 
-player1 = Player("Jakob", rooms["outside"])
+player1 = Player("Jakob", rooms["outside"], [])
 
 # Write a loop that:
 #
@@ -79,34 +79,83 @@ player1 = Player("Jakob", rooms["outside"])
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
-allowed_entries = ("n", "e", "s", "w", "q")
-entry = ""
 
 
-while entry != "q":
-    print("")
-    print("=========================")
+#  "Markup" variables
+space = ""
+line = "========================="
+
+directions = ("n", "e", "s", "w", "q")
+direction = ""
+
+
+def isDirection():
+    if len(direction.split()) == 1:
+        return True
+    else:
+        return False
+
+
+while direction != "q":
+    print(space)
+    print(line)
     print(player1)
     print("")
     player1.current_room.print_items_in_room()
-    print("=========================")
-    print("")
-    entry = input("Enter a direction. Enter q to quit: ")
+    print(space)
+    print(line)
+    player1.print_items_in_inventory()
+    print(space)
+    print(line)
+    direction = input("Enter a direction. Enter q to quit: ")
+    if isDirection():
+        while direction not in directions:
+            print(space)
+            print(line)
+            direction = input(
+                "Invalid direction. Enter either: n,e,s,w, or q (to quit)"
+            )
 
-    while entry not in allowed_entries:
-        print("")
-        print("=========================")
-        entry = input("Invalid entry. Enter either: n,e,s,w, or q (to quit)")
+        if direction != "q":
+            try:
+                player1.current_room = getattr(player1.current_room, f"{direction}_to")
+                print(space)
+                print(line)
+                print(f"{player1.name} went {direction} to {player1.current_room.name}")
+                print(space)
+                print(line)
+            except:
+                print(space)
+                print(line)
+                print(f"You can't go {direction} from here")
+    else:
+        verb, thing = direction.split()
+        if verb == "take" or verb == "get":
 
-    if entry != "q":
-        try:
-            player1.current_room = getattr(player1.current_room, f"{entry}_to")
-            print("=========================")
-            print("")
-            print(f"{player1.name} went {entry} to {player1.current_room.name}")
-            print("=========================")
-            print("")
-        except:
-            print("")
-            print("=========================")
-            print("You can't go that way")
+            if thing in [item.name for item in player1.current_room.item_list]:
+                for item in player1.current_room.item_list:
+                    if item.name == thing:
+                        player1.add_item_to_inventory(item)
+                        player1.current_room.remove_item_from_room(item)
+                        print(f"Picked up: {item.name}")
+                        break
+            else:
+                print(space)
+                print(line)
+                print(f"{item.name} wasn't found in this room")
+        elif verb == "drop":
+            if thing in [item.name for item in player1.inventory]:
+                for item in player1.inventory:
+                    if item.name == thing:
+                        player1.remove_item_from_inventory(item)
+                        player1.current_room.add_item_to_room(item)
+                        print(space)
+                        print(line)
+                        print(f"Dropped: {item.name}")
+                        break
+            else:
+                print(space)
+                print(line)
+                print(f"{item.name} wasn't found in inventory")
+        else:
+            print("invalid entry")
